@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>オリジナルTCG 公式ポータルサイト v2 (スプレッドシート連携)</title>
+    <style>
+        :root {
+            --primary-color: #0056b3;
+            --secondary-color: #f8f9fa;
+            --text-color: #333;
+            --bg-color: #edf2f7;
+        }
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+        header {
+            background-color: #1a202c;
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            cursor: pointer;
+        }
+        nav {
+            display: flex;
+            gap: 5px;
+        }
+        .nav-btn {
+            background: none;
+            border: none;
+            color: #a0aec0;
+            font-size: 16px;
+            font-weight: bold;
+            padding: 10px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .nav-btn:hover {
+            background-color: #2d3748;
+            color: white;
+        }
+        .nav-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        main {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+            min-height: 80vh;
+        }
+        .page-section {
+            display: none;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        .page-section.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        h1 {
+            border-bottom: 3px solid var(--primary-color);
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+        h2 {
+            color: var(--primary-color);
+            border-left: 5px solid var(--primary-color);
+            padding-left: 15px;
+            margin-top: 40px;
+        }
+        details {
+            background-color: #f8f9fa;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            padding: 10px 20px;
+        }
+        summary {
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 10px 0;
+            outline: none;
+        }
+        details p {
+            margin-top: 10px;
+            padding-top: 15px;
+            border-top: 1px dashed #cbd5e0;
+            color: #4a5568;
+            white-space: pre-wrap; /* スプレッドシートの改行を反映させる */
+        }
+        .coming-soon {
+            text-align: center;
+            padding: 50px 20px;
+            color: #718096;
+        }
+        .coming-soon span {
+            font-size: 60px;
+            display: block;
+            margin-bottom: 20px;
+        }
+        .primary-link-btn {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 18px;
+            margin-top: 20px;
+            transition: 0.2s;
+        }
+        .primary-link-btn:hover {
+            background-color: #004494;
+        }
+        .loading-text {
+            text-align: center;
+            color: #718096;
+            font-weight: bold;
+            padding: 20px;
+        }
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+            nav {
+                width: 100%;
+                overflow-x: auto;
+                white-space: nowrap;
+                padding-bottom: 5px;
+            }
+            .page-section {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-container">
+            <div class="logo" onclick="switchTab('home')">TCG Portal</div>
+            <nav>
+                <button class="nav-btn active" onclick="switchTab('home')" id="tab-home">ホーム</button>
+                <button class="nav-btn" onclick="switchTab('rules')" id="tab-rules">ルール</button>
+                <button class="nav-btn" onclick="switchTab('cards')" id="tab-cards">カードリスト</button>
+                <button class="nav-btn" onclick="switchTab('deck')" id="tab-deck">デッキ構築</button>
+                <button class="nav-btn" onclick="switchTab('faq')" id="tab-faq">FAQ・裁定</button>
+                <button class="nav-btn" onclick="switchTab('contact')" id="tab-contact">お問い合わせ</button>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section id="page-home" class="page-section active">
+            <h1>Welcome to TCG Portal</h1>
+            <p>ここはオリジナルTCGの公式ポータルサイトです。<br>上のメニューからルールブックの確認、カードの検索、デッキの構築が行えます。</p>
+        </section>
+
+        <section id="page-rules" class="page-section">
+            <h1>総合ゲームルールブック（仮）</h1>
+            <p>ルール内容は開発中です。</p>
+        </section>
+
+        <section id="page-cards" class="page-section">
+            <div class="coming-soon">
+                <span>🗂️</span>
+                <h1>カードデータベース</h1>
+                <p>現在システム構築中です。</p>
+            </div>
+        </section>
+
+        <section id="page-deck" class="page-section">
+            <div class="coming-soon">
+                <span>🃏</span>
+                <h1>デッキビルダー</h1>
+                <p>現在システム構築中です。</p>
+            </div>
+        </section>
+
+        <section id="page-faq" class="page-section">
+            <h1>FAQ・よくある質問と裁定</h1>
+            <p>カードの処理などで迷った場合は、まずこちらをご確認ください。</p>
+            
+            <!-- スプレッドシートから読み込んだFAQがここに追加されます -->
+            <div id="faq-container">
+                <p class="loading-text">🔄 データベースから最新の裁定を読み込み中...</p>
+            </div>
+        </section>
+
+        <section id="page-contact" class="page-section">
+            <h1>お問い合わせ・ご意見</h1>
+            <p>ゲームのルールに関するご質問等は以下のフォームよりお寄せください。</p>
+            <div style="text-align: center; padding: 30px;">
+                <a href="#" class="primary-link-btn" target="_blank">✉️ Googleフォームを開く</a>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // 【重要】ここにスプレッドシートで発行した「タブ区切り(tsv)」のURLを貼り付けます！
+        const FAQ_TSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSrrCPPFRXOTL8Ji2ZiTd5Nc9ytNOD2Mdg7zCiH_cZjiFEZsY0vPUeGdEKi1FTjDUwsTPNZ5Q_O-qj_/pub?output=tsv'; 
+        // ※上記はダミーURLです。ご自身のURLに書き換えてください。
+
+        // タブ切り替え処理
+        function switchTab(tabId) {
+            document.querySelectorAll('.page-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById('page-' + tabId).classList.add('active');
+            document.getElementById('tab-' + tabId).classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            // FAQタブが開かれた時に、データがまだ無ければ読み込む
+            if(tabId === 'faq' && !window.faqLoaded) {
+                loadFAQData();
+            }
+        }
+
+        // スプレッドシートからFAQデータを読み込む関数
+        async function loadFAQData() {
+            const container = document.getElementById('faq-container');
+            
+            try {
+                const response = await fetch(FAQ_TSV_URL);
+                if (!response.ok) throw new Error('ネットワークエラー');
+                
+                const textData = await response.text();
+                const rows = textData.split('\n'); // 行ごとに分割
+                
+                container.innerHTML = ''; // ロード中の文字を消す
+                
+                // 1行目（見出し）を飛ばして、2行目からループ処理
+                for (let i = 1; i < rows.length; i++) {
+                    const columns = rows[i].split('\t'); // タブで列を分割
+                    
+                    if (columns.length >= 2) {
+                        const question = columns[0].trim();
+                        const answer = columns[1].trim();
+                        
+                        // 質問と回答が空でなければHTMLを生成して追加
+                        if (question && answer) {
+                            const details = document.createElement('details');
+                            const summary = document.createElement('summary');
+                            const p = document.createElement('p');
+                            
+                            summary.textContent = 'Q. ' + question;
+                            p.textContent = 'A. ' + answer;
+                            
+                            details.appendChild(summary);
+                            details.appendChild(p);
+                            container.appendChild(details);
+                        }
+                    }
+                }
+                
+                // 読み込み完了フラグを立てる
+                window.faqLoaded = true;
+                
+            } catch (error) {
+                console.error('FAQ読み込みエラー:', error);
+                container.innerHTML = '<p style="color:red; text-align:center;">データの読み込みに失敗しました。URLが間違っているか、通信環境を確認してください。</p>';
+            }
+        }
+    </script>
+</body>
+</html>
