@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>オリジナルTCG 公式ポータルサイト v2 (スプレッドシート連携)</title>
+    <title>オリジナルTCG 公式ポータルサイト v3 (カードリスト追加)</title>
     <style>
         :root {
             --primary-color: #0056b3;
@@ -95,6 +95,139 @@
             padding-left: 15px;
             margin-top: 40px;
         }
+        
+        /* カードリスト用のスタイル */
+        .search-container {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #e2e8f0;
+        }
+        .search-container input, .search-container select {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        .search-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .search-btn:hover {
+            background-color: #004494;
+        }
+        
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        /* リストの各カードのデザイン */
+        .card-item {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            transition: 0.2s;
+            position: relative;
+        }
+        .card-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+            border-color: #cbd5e0;
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+        .card-name-area {
+            flex: 1;
+        }
+        .card-ruby {
+            font-size: 11px;
+            color: #718096;
+            margin-bottom: -2px;
+        }
+        .card-name {
+            font-size: 20px;
+            font-weight: bold;
+            color: #1a202c;
+            margin: 0;
+        }
+        .card-cost {
+            font-size: 24px;
+            font-weight: bold;
+            background-color: #edf2f7;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            border: 2px solid #cbd5e0;
+        }
+        .card-type {
+            font-size: 14px;
+            font-weight: bold;
+            color: #4a5568;
+            background-color: #e2e8f0;
+            padding: 4px 8px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+        .card-effect {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #2d3748;
+            background-color: #f7fafc;
+            padding: 10px;
+            border-radius: 6px;
+            min-height: 60px;
+            white-space: pre-wrap;
+        }
+        .card-stats {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 15px;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .card-power { color: #d63384; }
+        .card-damage { color: #0d6efd; }
+        
+        /* 属性(色)ごとの装飾 */
+        .attr-red .card-cost { background-color: #ffeaea; border-color: #ff4444; color: #ff4444; }
+        .attr-blue .card-cost { background-color: #eaebff; border-color: #4444ff; color: #4444ff; }
+        .attr-green .card-cost { background-color: #eaffea; border-color: #44aa44; color: #44aa44; }
+        .attr-yellow .card-cost { background-color: #fffcea; border-color: #ffcc00; color: #d4a700; }
+        .attr-orange .card-cost { background-color: #fff3ea; border-color: #ff8800; color: #ff8800; }
+        .attr-purple .card-cost { background-color: #f5eaff; border-color: #aa44cc; color: #aa44cc; }
+        
+        /* 色タグ(リッチテキスト)用のスタイル */
+        .text-red { color: #d9534f; font-weight: bold; }
+        .text-blue { color: #0275d8; font-weight: bold; }
+        .text-green { color: #5cb85c; font-weight: bold; }
+        .text-purple { color: #8e44ad; font-weight: bold; }
+        .text-orange { color: #f39c12; font-weight: bold; }
+        .text-yellow { color: #f0ad4e; font-weight: bold; }
+
+        /* その他既存UI */
         details {
             background-color: #f8f9fa;
             border: 1px solid #e2e8f0;
@@ -114,7 +247,7 @@
             padding-top: 15px;
             border-top: 1px dashed #cbd5e0;
             color: #4a5568;
-            white-space: pre-wrap; /* スプレッドシートの改行を反映させる */
+            white-space: pre-wrap;
         }
         .coming-soon {
             text-align: center;
@@ -138,29 +271,20 @@
             margin-top: 20px;
             transition: 0.2s;
         }
-        .primary-link-btn:hover {
-            background-color: #004494;
-        }
+        .primary-link-btn:hover { background-color: #004494; }
         .loading-text {
             text-align: center;
             color: #718096;
             font-weight: bold;
             padding: 20px;
         }
+
         @media (max-width: 768px) {
-            .header-container {
-                flex-direction: column;
-                gap: 15px;
-            }
-            nav {
-                width: 100%;
-                overflow-x: auto;
-                white-space: nowrap;
-                padding-bottom: 5px;
-            }
-            .page-section {
-                padding: 20px;
-            }
+            .header-container { flex-direction: column; gap: 15px; }
+            nav { width: 100%; overflow-x: auto; white-space: nowrap; padding-bottom: 5px; }
+            .page-section { padding: 20px; }
+            .search-container input, .search-container select { width: 100%; box-sizing: border-box; }
+            .search-btn { width: 100%; }
         }
     </style>
 </head>
@@ -191,11 +315,26 @@
             <p>ルール内容は開発中です。</p>
         </section>
 
+        <!-- ★ カードリスト画面 ★ -->
         <section id="page-cards" class="page-section">
-            <div class="coming-soon">
-                <span>🗂️</span>
-                <h1>カードデータベース</h1>
-                <p>現在システム構築中です。</p>
+            <h1>カードデータベース</h1>
+            
+            <div class="search-container">
+                <input type="text" id="searchKeyword" placeholder="カード名やテキストで検索..." onkeyup="if(event.key==='Enter') filterCards()">
+                <select id="searchColor">
+                    <option value="">すべての色</option>
+                    <option value="赤">赤</option>
+                    <option value="青">青</option>
+                    <option value="緑">緑</option>
+                    <option value="黄">黄</option>
+                    <option value="橙">橙</option>
+                    <option value="紫">紫</option>
+                </select>
+                <button class="search-btn" onclick="filterCards()">検索する</button>
+            </div>
+
+            <div id="cards-container" class="card-grid">
+                <p class="loading-text" style="grid-column: 1 / -1;">🔄 データベースからカード情報を読み込み中...</p>
             </div>
         </section>
 
@@ -210,8 +349,6 @@
         <section id="page-faq" class="page-section">
             <h1>FAQ・よくある質問と裁定</h1>
             <p>カードの処理などで迷った場合は、まずこちらをご確認ください。</p>
-            
-            <!-- スプレッドシートから読み込んだFAQがここに追加されます -->
             <div id="faq-container">
                 <p class="loading-text">🔄 データベースから最新の裁定を読み込み中...</p>
             </div>
@@ -219,7 +356,6 @@
 
         <section id="page-contact" class="page-section">
             <h1>お問い合わせ・ご意見</h1>
-            <p>ゲームのルールに関するご質問等は以下のフォームよりお寄せください。</p>
             <div style="text-align: center; padding: 30px;">
                 <a href="#" class="primary-link-btn" target="_blank">✉️ Googleフォームを開く</a>
             </div>
@@ -227,11 +363,15 @@
     </main>
 
     <script>
-        // 【重要】ここにスプレッドシートで発行した「タブ区切り(tsv)」のURLを貼り付けます！
-        const FAQ_TSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSrrCPPFRXOTL8Ji2ZiTd5Nc9ytNOD2Mdg7zCiH_cZjiFEZsY0vPUeGdEKi1FTjDUwsTPNZ5Q_O-qj_/pub?output=tsv'; 
-        // ※上記はダミーURLです。ご自身のURLに書き換えてください。
+        // 【重要】ここにスプレッドシートのURLを貼り付けます！
+        const FAQ_TSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT_Qc6B4Nn0M_eQW-H4lX2V3oE5MvMvD8qX5HqC_Tz6B4Nn0M_eQW-H4lX2V3oE5MvMvD8qX5HqC/pub?output=tsv'; 
+        
+        // ★ 新しく作ったカードリスト用スプレッドシートのURLをここに貼ります
+        const CARDS_TSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-dummy-url-for-cards-database/pub?output=tsv';
+        
+        // メモリ上にカードデータを保持しておく変数
+        let allCardsData = [];
 
-        // タブ切り替え処理
         function switchTab(tabId) {
             document.querySelectorAll('.page-section').forEach(section => {
                 section.classList.remove('active');
@@ -243,55 +383,202 @@
             document.getElementById('tab-' + tabId).classList.add('active');
             window.scrollTo({ top: 0, behavior: 'smooth' });
 
-            // FAQタブが開かれた時に、データがまだ無ければ読み込む
             if(tabId === 'faq' && !window.faqLoaded) {
                 loadFAQData();
             }
+            if(tabId === 'cards' && !window.cardsLoaded) {
+                loadCardsData();
+            }
         }
 
-        // スプレッドシートからFAQデータを読み込む関数
-        async function loadFAQData() {
-            const container = document.getElementById('faq-container');
+        // [色]文字[/色] タグをHTMLの <span> に変換する関数
+        function parseColorTags(text) {
+            if(!text) return "";
+            
+            // 安全のためHTMLタグをエスケープ
+            let htmlText = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            
+            const colorMap = {
+                '赤': 'text-red', 'red': 'text-red',
+                '青': 'text-blue', 'blue': 'text-blue',
+                '緑': 'text-green', 'green': 'text-green',
+                '紫': 'text-purple', 'purple': 'text-purple',
+                '橙': 'text-orange', 'orange': 'text-orange',
+                '黄': 'text-yellow', 'yellow': 'text-yellow'
+            };
+
+            // 正規表現で [色]...[/色] を <span>...</span> に置換
+            htmlText = htmlText.replace(/\[(.*?)\](.*?)\[\/.*?\]/g, (match, colorName, content) => {
+                const cssClass = colorMap[colorName];
+                if(cssClass) {
+                    return `<span class="${cssClass}">${content}</span>`;
+                }
+                return match; // 対応しない色はそのまま
+            });
+            
+            return htmlText;
+        }
+
+        // ==========================================
+        // カードデータ読み込み処理
+        // ==========================================
+        async function loadCardsData() {
+            const container = document.getElementById('cards-container');
             
             try {
-                const response = await fetch(FAQ_TSV_URL);
+                // ※※ テスト用ダミーデータ生成（実際にURLが設定されるまではこれで動きます）※※
+                if(CARDS_TSV_URL.includes('dummy-url')) {
+                    allCardsData = [
+                        { ruby: "ひゃくじゅうおう レグルス", name: "百獣王 レグルス", type: "サモン / 動物", cost: "7", color: "赤", effect: "[赤]好戦[/赤]\n出た時、相手のコスト6以下のカード2枚までを対象とする。それを破壊する。", power: "8000", damage: "7" },
+                        { ruby: "しっそうするチーター", name: "疾走するチーター", type: "サモン / 動物", cost: "3", color: "赤", effect: "このカードはターン終了時まで[青]俊足[/青]を得る。", power: "3000", damage: "3" },
+                        { ruby: "あおきまどうし", name: "蒼き魔導師", type: "サモン / 魔法使い", cost: "4", color: "青", effect: "出た時、カードを2枚引く。", power: "4000", damage: "4" }
+                    ];
+                    renderCards(allCardsData);
+                    window.cardsLoaded = true;
+                    return;
+                }
+
+                const response = await fetch(CARDS_TSV_URL);
                 if (!response.ok) throw new Error('ネットワークエラー');
                 
                 const textData = await response.text();
-                const rows = textData.split('\n'); // 行ごとに分割
+                const rows = textData.split('\n');
                 
-                container.innerHTML = ''; // ロード中の文字を消す
+                allCardsData = [];
                 
-                // 1行目（見出し）を飛ばして、2行目からループ処理
+                // 1行目は見出しとして扱う
+                // A:ルビ, B:カード名, C:種類, D:合計コスト, E:色, F:効果, G:パワー, H:打点
                 for (let i = 1; i < rows.length; i++) {
-                    const columns = rows[i].split('\t'); // タブで列を分割
-                    
+                    const columns = rows[i].split('\t');
+                    if (columns.length >= 6 && columns[1].trim() !== '') { // 名前があるカードのみ
+                        allCardsData.push({
+                            ruby: columns[0]?.trim() || "",
+                            name: columns[1].trim(),
+                            type: columns[2]?.trim() || "",
+                            cost: columns[3]?.trim() || "",
+                            color: columns[4]?.trim() || "",
+                            effect: columns[5]?.trim() || "",
+                            power: columns[6]?.trim() || "",
+                            damage: columns[7]?.trim() || ""
+                        });
+                    }
+                }
+                
+                renderCards(allCardsData);
+                window.cardsLoaded = true;
+                
+            } catch (error) {
+                console.error('カード読み込みエラー:', error);
+                container.innerHTML = '<p style="color:red; text-align:center;">データの読み込みに失敗しました。</p>';
+            }
+        }
+
+        // 絞り込み検索処理
+        function filterCards() {
+            const keyword = document.getElementById('searchKeyword').value.toLowerCase();
+            const colorFilter = document.getElementById('searchColor').value;
+            
+            const filteredCards = allCardsData.filter(card => {
+                // キーワード判定（名前、ルビ、テキスト、種類）
+                const matchKeyword = !keyword || 
+                                     card.name.toLowerCase().includes(keyword) || 
+                                     card.ruby.toLowerCase().includes(keyword) || 
+                                     card.effect.toLowerCase().includes(keyword) ||
+                                     card.type.toLowerCase().includes(keyword);
+                
+                // 色判定
+                const matchColor = !colorFilter || card.color.includes(colorFilter);
+                
+                return matchKeyword && matchColor;
+            });
+            
+            renderCards(filteredCards);
+        }
+
+        // カードを画面に並べる描画処理
+        function renderCards(cardsArray) {
+            const container = document.getElementById('cards-container');
+            container.innerHTML = '';
+            
+            if(cardsArray.length === 0) {
+                container.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: #718096; padding: 40px;">条件に一致するカードが見つかりませんでした。</p>';
+                return;
+            }
+
+            const colorClassMap = {
+                '赤': 'attr-red', '青': 'attr-blue', '緑': 'attr-green',
+                '黄': 'attr-yellow', '橙': 'attr-orange', '紫': 'attr-purple'
+            };
+
+            cardsArray.forEach(card => {
+                // 色からCSSクラスを判定（一番左の文字で判定）
+                const firstColorChar = card.color ? card.color.charAt(0) : '';
+                const attrClass = colorClassMap[firstColorChar] || '';
+                
+                // エフェクトの改行コードと色タグをHTMLに変換
+                let displayEffect = parseColorTags(card.effect);
+
+                // パワーと打点の表示制御
+                let statsHtml = '';
+                if(card.power || card.damage) {
+                    statsHtml = `<div class="card-stats">`;
+                    if(card.power) statsHtml += `<div class="card-power">Pow: ${card.power}</div>`;
+                    if(card.damage) statsHtml += `<div class="card-damage">Dmg: ${card.damage}</div>`;
+                    statsHtml += `</div>`;
+                }
+
+                const cardHtml = `
+                    <div class="card-item ${attrClass}">
+                        <div class="card-header">
+                            <div class="card-name-area">
+                                <div class="card-ruby">${card.ruby}</div>
+                                <h3 class="card-name">${card.name}</h3>
+                            </div>
+                            <div class="card-cost">${card.cost}</div>
+                        </div>
+                        <div class="card-type">${card.type}</div>
+                        <div class="card-effect">${displayEffect}</div>
+                        ${statsHtml}
+                    </div>
+                `;
+                
+                container.insertAdjacentHTML('beforeend', cardHtml);
+            });
+        }
+
+
+        // ==========================================
+        // FAQ読み込み処理（既存）
+        // ==========================================
+        async function loadFAQData() {
+            const container = document.getElementById('faq-container');
+            try {
+                const response = await fetch(FAQ_TSV_URL);
+                if (!response.ok) throw new Error('ネットワークエラー');
+                const textData = await response.text();
+                const rows = textData.split('\n'); 
+                container.innerHTML = ''; 
+                for (let i = 1; i < rows.length; i++) {
+                    const columns = rows[i].split('\t'); 
                     if (columns.length >= 2) {
                         const question = columns[0].trim();
                         const answer = columns[1].trim();
-                        
-                        // 質問と回答が空でなければHTMLを生成して追加
                         if (question && answer) {
                             const details = document.createElement('details');
                             const summary = document.createElement('summary');
                             const p = document.createElement('p');
-                            
                             summary.textContent = 'Q. ' + question;
                             p.textContent = 'A. ' + answer;
-                            
                             details.appendChild(summary);
                             details.appendChild(p);
                             container.appendChild(details);
                         }
                     }
                 }
-                
-                // 読み込み完了フラグを立てる
                 window.faqLoaded = true;
-                
             } catch (error) {
                 console.error('FAQ読み込みエラー:', error);
-                container.innerHTML = '<p style="color:red; text-align:center;">データの読み込みに失敗しました。URLが間違っているか、通信環境を確認してください。</p>';
+                container.innerHTML = '<p style="color:red; text-align:center;">データの読み込みに失敗しました。</p>';
             }
         }
     </script>
