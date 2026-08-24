@@ -307,8 +307,8 @@
         </section>
     </main>
 
-    <script>
-        // 【重要】ここにスプレッドシートのURLを貼り付けます！
+<script>
+        // 設定していただいた完璧なURL
         const FAQ_TSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSrrCPPFRXOTL8Ji2ZiTd5Nc9ytNOD2Mdg7zCiH_cZjiFEZsY0vPUeGdEKi1FTjDUwsTPNZ5Q_O-qj_/pub?gid=0&single=true&output=tsv'; 
         const CARDS_TSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSrrCPPFRXOTL8Ji2ZiTd5Nc9ytNOD2Mdg7zCiH_cZjiFEZsY0vPUeGdEKi1FTjDUwsTPNZ5Q_O-qj_/pub?gid=646055905&single=true&output=tsv';
         
@@ -343,18 +343,8 @@
         async function loadCardsData() {
             const container = document.getElementById('cards-container');
             try {
-                if(CARDS_TSV_URL.includes('dummy-url')) {
-                    allCardsData = [
-                        { ruby: "ひゃくじゅうおう レグルス", name: "百獣王 レグルス", type: "サモン / 動物", cost: "7", color: "赤", effect: "[赤]好戦[/赤]\n出た時、相手のコスト6以下のカード2枚までを対象とする。それを破壊する。", power: "8000", damage: "7" },
-                        { ruby: "しっそうするチーター", name: "疾走するチーター", type: "サモン / 動物", cost: "3", color: "赤", effect: "このカードはターン終了時まで[青]俊足[/青]を得る。", power: "3000", damage: "3" },
-                        { ruby: "あおきまどうし", name: "蒼き魔導師", type: "サモン / 魔法使い", cost: "4", color: "青", effect: "出た時、カードを2枚引く。", power: "4000", damage: "4" }
-                    ];
-                    renderCards(allCardsData);
-                    window.cardsLoaded = true;
-                    return;
-                }
-
-                const response = await fetch(CARDS_TSV_URL);
+                // ★裏技：URLの末尾に現在時刻をつけてキャッシュを無効化する
+                const response = await fetch(CARDS_TSV_URL + '&t=' + new Date().getTime());
                 if (!response.ok) throw new Error('ネットワークエラー');
                 const textData = await response.text();
                 const rows = textData.split('\n');
@@ -430,7 +420,8 @@
         async function loadFAQData() {
             const container = document.getElementById('faq-container');
             try {
-                const response = await fetch(FAQ_TSV_URL);
+                // ★裏技：URLの末尾に現在時刻をつけてキャッシュを無効化する
+                const response = await fetch(FAQ_TSV_URL + '&t=' + new Date().getTime());
                 if (!response.ok) throw new Error('ネットワークエラー');
                 const textData = await response.text();
                 const rows = textData.split('\n'); 
